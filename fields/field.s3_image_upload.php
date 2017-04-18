@@ -937,74 +937,19 @@
 			
 			$element = new XMLElement($this->get('element_name'));
 
-			if (empty($data)){
-				return;
-			}
-
 			$dimensions = new XMLElement('supported-dimensions');
 			foreach ( explode(',', $data['supported_dimensions']) as $key => $value) {
-
-				$dimension = explode('x', $value);
-
-				$width = $dimension[0];
-				$height = $dimension[1];
-
-
-				if ( empty($height)){
-					$ratio = $data['width'] / $data['height'];
-					$height = $data['width'] / $ratio;
-				}
-
-				if ( empty($width)){
-					$ratio = $data['height'] / $data['width'];
-					$width = $data['height'] / $ratio;
-				}
-
-
-				$dimensions->appendChild(
-					new XMLElement(
-						'image',
-						$this->setEndpoint($this->s3Client->getObjectUrl(
-							$this->get('bucket'),
-							$this->filenamePrefix(
-								$data['filename'],
-								$value)
-							)
-						),
-						array(
-							'dimension'=>$value,
-							'width'=> $width,
-							'height'=> $height,
-							)
-						)
-					);
+				$dimensions->appendChild(new XMLElement('image',$this->setEndpoint($this->s3Client->getObjectUrl($this->get('bucket'),$this->filenamePrefix($data['filename'],$value))),array('dimension'=>$value)));
 			}
 
-
 			//add image as cropped by user
-			$dimensions->appendChild(
-				new XMLElement(
-					'image',
-					$this->setEndpoint($this->s3Client->getObjectUrl(
-						$this->get('bucket'),
-						$this->filenamePrefix(
-							$data['filename'],
-							'cropped')
-						)
-					),
-					array(
-						'dimension'=>'cropped',
-						'width'=> $data['width'],
-						'height'=> $data['height']
-						)
-					)
-				);
+			$dimensions->appendChild(new XMLElement('image',$this->setEndpoint($this->s3Client->getObjectUrl($this->get('bucket'),$this->filenamePrefix($data['filename'],'cropped'))),array('dimension'=>'cropped')));
 
 			$element->appendChild($dimensions);
 
 			$element->setAttributeArray(array(
-				'width' => $data['width'],
-				'height' => $data['height'],
+				// 'width' => $data['width'],
+				// 'height' => $data['height'],
 				'crop-position' => $data['crop_position'],
 				'original' => $this->setEndpoint($this->s3Client->getObjectUrl($this->get('bucket'),$this->getOriginalImgName($data['filename']))),
 				'original-key' => $this->getOriginalImgName($data['filename'])
