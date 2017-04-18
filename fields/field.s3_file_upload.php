@@ -94,7 +94,7 @@
 		private function setEndpoint($s3ObjectUrl){
 			$customEndpoint = $this->get('custom_endpoint');
 			if ($customEndpoint == "yes"){
-				return str_replace("https://s3.amazonaws.com/" . $this->get('bucket') , "http://" . $this->get('bucket'), $s3ObjectUrl);
+				return str_replace("https://s3.amazonaws.com/" . $this->get('bucket') , "https://" . $this->get('bucket'), $s3ObjectUrl);
 			} else return $s3ObjectUrl;
 		}
 
@@ -209,10 +209,12 @@
 
 			// append assets
 			$assets_path = '/extensions/s3_image_upload/assets/';
+			Administration::instance()->Page->addScriptToHead(URL . $assets_path .'aws-sdk-2.1.24.min.js', 430, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'image_crop.css', 'screen', 120, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'dropzone.css', 'screen', 130, false);
 			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'dropzone.js', 420, false);
 			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'file_upload.js', 430, false);
+			
 
 			// initialize some variables
 			$id = $this->get('id');
@@ -232,7 +234,9 @@
 			$wrapper->appendChild($label);
 
 			// main upload container
+
 			$dropzoneContainer = new XMLElement('div', "<span class='dropzone-click'>Drop files or click to upload</span>", array('class' => 'dropzone-container','data-file-upload' => 'yes'));
+	
 			$wrapper->appendChild($dropzoneContainer);
 
 			if (isset($data['filename'])){
@@ -247,8 +251,8 @@
 				foreach ($data['filename'] as $key => $value) {
 
 					$filesrc = $this->setEndpoint($this->s3Client->getObjectUrl($this->get('bucket'),  $data['filepath'][$key],$this->get('expires')));
-
-					$fileType = 'file';
+					
+$fileType = 'file';
 					$previewImage = '';
 					if (strpos($data['mimetype'][$key], 'image') > -1){
 						$previewImage = $filesrc;
@@ -263,11 +267,13 @@
 													'<div class="dz-size" data-dz-size></div>'.
 												'</div>'.
 											'</div>'.
+											'<a id="delete_file" href="javascript:void(0)"> Delete </a>'.			
 										'</div>' . 
+										
 
-										"<input name='{$fieldname}[filename][{$key}]' value='{$data['filename'][$key]}' type='hidden'/>" .
-										"<input name='{$fieldname}[filepath][{$key}]' value='{$data['filepath'][$key]}' type='hidden'/>" .
-										"<input name='{$fieldname}[mimetype][{$key}]' value='{$data['mimetype'][$key]}' type='hidden'/>" ;
+										"<input name='{$fieldname}[filename][{$key}]' class='h_input' value='{$data['filename'][$key]}' type='hidden'/>" .
+										"<input name='{$fieldname}[filepath][{$key}]' class='h_input' value='{$data['filepath'][$key]}' type='hidden'/>" .
+										"<input name='{$fieldname}[mimetype][{$key}]' class='h_input' value='{$data['mimetype'][$key]}' type='hidden'/>" ;
 				}
 			}
 
@@ -381,3 +387,4 @@
 
 
 	}
+
